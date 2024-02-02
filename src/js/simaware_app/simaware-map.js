@@ -235,7 +235,7 @@ async function initializeAirports()
     airportsByIata = [];
     airportsByPrefix = [];
 
-    let response = await fetchRetry('/livedata/airports.json');
+    let response = await fetchRetry(dataserver + 'api/livedata/airports.json');
     airports = await response.json();
 
     $.each(airports, (idx, obj) => {
@@ -298,10 +298,11 @@ async function initializePatrons()
 async function initializeATC()
 {
 
+    layers_positions = {};
+
     let response = await fetch('/livedata/layers_positions.json');
     let lp = await response.json();
 
-    layers_positions = {};
     for(i in lp)
     {
         var l = lp[i];
@@ -2453,8 +2454,6 @@ async function toggleATC()
     {
         map.removeLayer(atc_featuregroup);
         $('.map-button#atc').removeClass('map-button-active');
-        $('.map-button#layers').removeClass('map-button-active');
-        $.cookie('layers', 'false', {expires: 180});
     }
     else
     {
@@ -2471,12 +2470,14 @@ async function toggleATC()
             atc_featuregroup.addLayer(atc_leg_featuregroup);
         }
         $('.map-button#atc').addClass('map-button-active');
-        $('.map-button#layers').removeClass('map-button-active');
         setLayerOrder();
         refreshATC();
         $.cookie('atc', 'true', {expires: 180});
-        $.cookie('layers', 'false', {expires: 180});
     }
+
+    $.cookie('layers', 'false', {expires: 180});
+    $('.map-button#layers').removeClass('map-button-active');
+    $('#layers-status').hide();
 }
 
 async function toggleLayers()
